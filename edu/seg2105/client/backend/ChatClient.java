@@ -27,7 +27,7 @@ public class ChatClient extends AbstractClient
    * the display method in the client.
    */
   ChatIF clientUI; 
-
+ 
   
   //Constructors ****************************************************
   
@@ -80,6 +80,19 @@ public class ChatClient extends AbstractClient
       quit();
     }
   }
+  
+  @Override
+  protected void connectionClosed() {
+      System.out.println("The server has shut down.");
+      quit();
+  }
+
+  @Override
+  protected void connectionException(Exception exception) {
+      System.out.println("The server has shut down due to an exception.");
+      quit();
+  }
+
   
   /**
    * This method terminates the client.

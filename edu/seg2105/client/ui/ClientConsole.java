@@ -68,7 +68,8 @@ public class ClientConsole implements ChatIF
     // Create scanner object to read from console
     fromConsole = new Scanner(System.in); 
   }
-
+  
+  
   
   //Instance methods ************************************************
   
@@ -117,19 +118,19 @@ public class ClientConsole implements ChatIF
    */
   public static void main(String[] args) 
   {
-    String host = "";
+    String host = (args.length > 0) ? args[0] : "localhost"; 
+    int port = DEFAULT_PORT; // Default port
 
+    if (args.length > 1) {
+      try {
+        port = Integer.parseInt(args[1]);
+      } catch (NumberFormatException e) {
+        System.err.println("Invalid port number. Using default port " + DEFAULT_PORT + ".");
+      }
+    }
 
-    try
-    {
-      host = args[0];
-    }
-    catch(ArrayIndexOutOfBoundsException e)
-    {
-      host = "localhost";
-    }
-    ClientConsole chat= new ClientConsole(host, DEFAULT_PORT);
-    chat.accept();  //Wait for console data
+    ClientConsole chat = new ClientConsole(host, port);
+    chat.accept();  
   }
 }
 //End of ConsoleChat class
