@@ -67,18 +67,99 @@ public class ChatClient extends AbstractClient
    *
    * @param message The message from the UI.    
    */
-  public void handleMessageFromClientUI(String message)
-  {
-    try
-    {
-      sendToServer(message);
-    }
-    catch(IOException e)
-    {
-      clientUI.display
-        ("Could not send message to server.  Terminating client.");
-      quit();
-    }
+
+  public void handleMessageFromClientUI(String message) {
+      if (message.startsWith("#")) {
+          handleCommand(message);
+      } else {
+          try {
+              sendToServer(message);
+          } catch (IOException e) {
+              clientUI.display("Could not send message to server. Terminating client.");
+              quit();
+          }
+      }
+  }
+
+  // Handle commands starting with #
+  private void handleCommand(String command) {
+      String[] parts = command.split(" ");
+      String cmd = parts[0];
+
+      switch (cmd) {
+          case "#quit":
+              quit();
+              break;
+          case "#logoff":
+              logoff(); 
+              break;
+          case "#sethost":
+              if (isLoggedOff()) { 
+                  if (parts.length > 1) {
+                      setHost(parts[1]); 
+                      clientUI.display("Host set to: " + parts[1]);
+                  } else {
+                      clientUI.display("Usage: #sethost <host>");
+                  }
+              } else {
+                  clientUI.display("Error: You must be logged off to change the host.");
+              }
+              break;
+          case "#setport":
+              if (isLoggedOff()) { 
+                  if (parts.length > 1) {
+                      try {
+                          int port = Integer.parseInt(parts[1]);
+                          setPort(port); 
+                          clientUI.display("Port set to: " + port);
+                      } catch (NumberFormatException e) {
+                          clientUI.display("Error: Invalid port number.");
+                      }
+                  } else {
+                      clientUI.display("Usage: #setport <port>");
+                  }
+              } else {
+                  clientUI.display("Error: You must be logged off to change the port.");
+              }
+              break;
+          case "#login":
+              if (!isConnected()) { 
+                  try {
+                      openConnection(); 
+                      clientUI.display("Logged in to server.");
+                  } catch (IOException e) {
+                      clientUI.display("Failed to connect to server.");
+                  }
+              } else {
+                  clientUI.display("Error: Already connected.");
+              }
+              break;
+          case "#gethost":
+              clientUI.display("Current host: " + getHost()); 
+              break;
+          case "#getport":
+              clientUI.display("Current port: " + getPort()); 
+              break;
+          default:
+              clientUI.display("Error: Unknown command.");
+      }
+  }
+
+  private void logoff() {
+      if (isConnected()) {
+          try {
+              closeConnection(); 
+              clientUI.display("Logged off from the server.");
+          } catch (IOException e) {
+              clientUI.display("Error while logging off: " + e.getMessage());
+          }
+      } else {
+          clientUI.display("Error: Not currently connected to the server.");
+      }
+  }
+  
+  private boolean isLoggedOff() {
+      return !isConnected(); 
   }
   
   @Override
