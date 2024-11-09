@@ -119,8 +119,8 @@ public class ClientConsole implements ChatIF
   public static void main(String[] args) 
   {
 	String loginID = "";
-    String host = ""; 
-    int port = 0; 
+    String host = "localhost"; 
+    int port = DEFAULT_PORT; 
 
     try {
         loginID = args[0];
